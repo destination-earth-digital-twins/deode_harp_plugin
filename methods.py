@@ -7,6 +7,7 @@ import yaml
 import pyproj
 import glob
 import subprocess
+import re
 from deode.toolbox import Platform
 
 
@@ -35,9 +36,11 @@ class ConfigHarpverify(object):
         self.startyyyymmddhh=datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y%m%d%H")
         self.startyyyy=datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y")
         self.startmm=datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ").strftime("%m")
-        self.endyyyymmddhh=datetime.strptime(self.end, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y%m%d%H")
+        #self.endyyyymmddhh=datetime.strptime(self.end, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y%m%d%H")
+        #self.endyyyymmddhh = (datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=int(self.forecast_range.replace("PT", "").replace("h", "")))).strftime("%Y%m%d%H")
         self.cycle_length = self.platform.get_value("general.times.cycle_length")
         self.forecast_range = self.platform.get_value("general.times.forecast_range")
+        self.endyyyymmddhh = (datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=int(re.sub(r"\D", "", self.forecast_range)))).strftime("%Y%m%d%H")
         self.exp = self._set_exp()
         self.case = self.platform.get_value("general.case")
         self.sqlites_exp_path=self.platform.get_value("extractsqlite.sqlite_path")
@@ -66,9 +69,9 @@ class ConfigHarpverify(object):
             self._exp_args["verif"]["fcst_model"]=[self.ref_name,self.case]
             self._exp_args["verif"]["project_name"]=[self.case]
             self._exp_args["verif"]["fcst_path"]=[self.home + '/FCTABLE/']
-            self._exp_args["verif"]["obs_path"]=[self.home + '/OBSTABLE/']
+            self._exp_args["verif"]["obs_path"]=[self.home + '/OBSTABLESOPER/']
             self._exp_args["verif"]["verif_path"]=[self.home + '/cases/'+self.csc]
-            self._exp_args["post"]["plot_output"]=[self.home + '/cases/'+self.csc]
+            self._exp_args["post"]["plot_output"]=[self.home + '/casesplots/'+self.csc]
             self._exp_args["scorecards"]["ref_model"]=[self.ref_name]
             self._exp_args["scorecards"]["fcst_model"]=[self.case]
             if write==True:

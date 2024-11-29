@@ -32,7 +32,7 @@ class Verification(Task):
         harp_scripts=self.config_verif.harpscripts_home
         print(harp_scripts)
         os.chdir(harp_scripts)
-        self.batch.run(f"{harp_scripts}/verification/point_verif.R -config_file {config_yaml_filename} -start_date {start_date} -end_date {end_date} -params_list=T2m,S10m,D10m,Pmsl,Gmax,S,T,RH,D,Pcp,CCtot")
-        #self.batch.run(f"{harp_scripts}/verification/point_verif.R -config_file {config_yaml_filename} -start_date {start_date} -end_date {end_date} -params_list=T2m")
+        self.batch.run(f"{harp_scripts}/verification/point_verif.R -config_file {config_yaml_filename} -start_date {start_date} -end_date {start_date} -params_list=T2m,S10m,D10m,Pmsl,Gmax,S,T,RH,D,Pcp,CCtot")
+        #self.batch.run(f"{harp_scripts}/verification/point_verif.R -config_file {config_yaml_filename} -start_date {start_date} -end_date {end_date} -params_list=T2m,S10m,D10m,Pmsl,Gmax,Pcp,CCtot")
         #print(f"verif home es {self.config_verif.home} (clase) y {os.environ.get("VERIF_HOME")} (entorno)") 
 

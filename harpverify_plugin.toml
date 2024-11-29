@@ -1,7 +1,7 @@
 #[general]
 #  case = "spaveripy"
 [general.plugin_registry.plugins]
-  harpverify = "/perm/sp3c/deode_project/deode_plugins/"
+  harpverify = "/home/sp3c/deode_project/deode_plugins/"
 [suite_control]
   suite_definition = "HarpverifySuiteDefinition"
 [submission]
@@ -22,10 +22,10 @@
   DEODE = "awesome"
   DUSER = "aut6432"
   HUSER = "sp3c"
-  HARPSCRIPTS_HOME = "/perm/sp3c/deode_project/oper-harp-verif/"
-  VERIF_HOME= "/perm/sp3c/deode_project/deode_harp_output/"
-  REF_SQLITES="/perm/sp3c/deode_project/FCTABLE/"
-  OBSTABLES_PATH="/perm/sp3c/deode_project/OBSTABLE_ALL/"
+  HARPSCRIPTS_HOME = "/home/sp3c/deode_project/oper-harp-verif/"
+  VERIF_HOME= "/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/"
+  REF_SQLITES="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLE/"
+  OBSTABLES_PATH="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/OBSTABLE_MERGED/"
   REF_NAME="Global_DT"
   ECFS_ARCHIVE_RELPATH="/deode/HARP_VERIF/cases/"
 

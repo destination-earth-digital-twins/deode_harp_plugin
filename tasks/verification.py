@@ -26,6 +26,11 @@ class Verification(Task):
         #print(f"verif home es {self.config_verif.home} (clase) y {os.environ.get("VERIF_HOME")} (entorno)")
         os.chdir(self.config_verif.home)
         config_yaml_filename,exp_args = self.config_verif.write_config_yml()
+        verif_path=exp_args["verif"]["verif_path"][0]
+        plot_verif_path=exp_args["post"]["plot_output"][0]
+        #Create paths where RDS and pngs will be saved
+        os.makedirs(plot_verif_path, exist_ok=True)
+        os.makedirs(verif_path, exist_ok=True)
         print(config_yaml_filename)
         start_date=self.config_verif.startyyyymmddhh
         end_date=self.config_verif.endyyyymmddhh

@@ -52,6 +52,7 @@ class ConfigHarpverify(object):
         self.config_yaml = None
         self.config_yaml_filename = None
         self.ecfs_archive_relpath = os.environ.get("ECFS_ARCHIVE_RELPATH")
+        self.csc_resol=self.config["general.csc"]+'_'+str(self.config["domain.xdx"])+'m'
 
     def write_config_yml(self,write=True):
         """descrp.
@@ -64,16 +65,30 @@ class ConfigHarpverify(object):
         self.config_yaml_filename = os.path.join(self.home, f"config_files/deode_conf_{self.case}.yml")
         print("config_template es")
         print(config_template)
+        
+        #These lines come from linkobsfctables.py and are adapted here to fill the config file for harp's R script
+        #Extract it from the sqlites_exp_path variable (i.e /YYYY/MM/DD/HH//{type_of_extreme}/{order_of_run}
+        sqlites_relpath=self.sqlites_exp_path.replace(self.huser,self.duser).split('deode')[1]
+        exp_relpath=sqlites_relpath.split('sqlite')[0]
+        # The lines above should be something like '/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/' (without the last 2 for the second one)
+        exp_scratch=self.sqlites_exp_path.replace(self.huser,self.duser)
+        #The line above should be something like /scratch/aut6432/DE_NWP/deode/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/
+        local_fctables=os.path.join(self.home,f"FCTABLES/",exp_relpath.lstrip('/'),self.startyyyy,self.startmm)
+        #The line above evaluates ~ /ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES//2024/12/03/00//convection/1/HARMONIE_AROME_500m/YYYY/MM/
+        local_fctables_ref=local_fctables.split(self.csc)[0] #This is where REF's folder with FCTABLES should be linked
+        #The line above is where the Global_DT FCTABLES should be downloaded or linked for this experiment. It should be something like:
+        #/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES/2024/12/03/00//convection/1/Global_DT
+
         if os.path.isfile(config_template):
             self._exp_args = ConfigHarpverify.load_yaml(config_template)
-            self._exp_args["verif"]["fcst_model"]=[self.ref_name,self.case]
+            self._exp_args["verif"]["fcst_model"]=[self.ref_name,self.csc_resol]
             self._exp_args["verif"]["project_name"]=[self.case]
-            self._exp_args["verif"]["fcst_path"]=[self.home + '/FCTABLE/']
+            self._exp_args["verif"]["fcst_path"]=[local_fctables.split(self.csc)[0]]
             self._exp_args["verif"]["obs_path"]=[self.home + '/OBSTABLESOPER/']
-            self._exp_args["verif"]["verif_path"]=[self.home + '/cases/'+self.csc]
-            self._exp_args["post"]["plot_output"]=[self.home + '/casesplots/'+self.csc]
+            self._exp_args["verif"]["verif_path"]=[os.path.join(self.home,'cases',exp_relpath.lstrip('/').split(self.csc)[0])]
+            self._exp_args["post"]["plot_output"]=[os.path.join(self.home,'casesplots',exp_relpath.lstrip('/').split(self.csc)[0])]
             self._exp_args["scorecards"]["ref_model"]=[self.ref_name]
-            self._exp_args["scorecards"]["fcst_model"]=[self.case]
+            self._exp_args["scorecards"]["fcst_model"]=[self.csc_resol]
             if write==True:
                ConfigHarpverify.save_yaml(self.config_yaml_filename, self._exp_args)
                print("wrote yml file at"+self.config_yaml_filename)

@@ -28,6 +28,8 @@
   OBSTABLES_PATH="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/OBSTABLE_MERGED/"
   REF_NAME="Global_DT"
   ECFS_ARCHIVE_RELPATH="/deode/HARP_VERIF/cases/"
+  DCMDB_DIR="/home/sp3c/deode_project/dcmdb/"
+  DW_DIR="/home/sp3c/deode_project/Deode-Workflow"
 
 [submission.harpverify_group.MODULES]
   ECFLOW = ["load", "ecflow"]

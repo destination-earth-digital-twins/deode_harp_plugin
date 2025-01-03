@@ -36,6 +36,7 @@ class ConfigHarpverify(object):
         self.startyyyymmddhh=datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y%m%d%H")
         self.startyyyy=datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y")
         self.startmm=datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ").strftime("%m")
+        self.startdd=datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ").strftime("%d")
         #self.endyyyymmddhh=datetime.strptime(self.end, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y%m%d%H")
         #self.endyyyymmddhh = (datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=int(self.forecast_range.replace("PT", "").replace("h", "")))).strftime("%Y%m%d%H")
         self.cycle_length = self.platform.get_value("general.times.cycle_length")
@@ -62,7 +63,7 @@ class ConfigHarpverify(object):
         """
         print('self.home es ' + self.home)
         config_template = os.path.join(self.home,"config_files/deode_conf.yml")
-        self.config_yaml_filename = os.path.join(self.home, f"config_files/deode_conf_{self.case}.yml")
+        self.config_yaml_filename = os.path.join(self.home, f"config_files/",self.startyyyy,self.startmm,self.startdd,f"deode_conf_{self.case}.yml")
         print("config_template es")
         print(config_template)
         

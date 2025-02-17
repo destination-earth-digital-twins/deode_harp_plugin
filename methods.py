@@ -47,6 +47,8 @@ class ConfigHarpverify(object):
         self.sqlites_exp_path=self.platform.get_value("extractsqlite.sqlite_path")
         self.sqlites_ref_path=os.environ.get("REF_SQLITES")
         self.sqlites_obs_path=os.environ.get("OBSTABLES_PATH")
+        self.rdss_path=os.environ.get("RDSS_PATH")
+        self.pngs_path=os.environ.get("PNGS_PATH")
         self.ref_name=os.environ.get("REF_NAME")
         self._case_args = None
         self._exp_args = None
@@ -86,8 +88,8 @@ class ConfigHarpverify(object):
             self._exp_args["verif"]["project_name"]=[self.case]
             self._exp_args["verif"]["fcst_path"]=[local_fctables.split(self.csc)[0]]
             self._exp_args["verif"]["obs_path"]=[self.home + '/OBSTABLESOPER/']
-            self._exp_args["verif"]["verif_path"]=[os.path.join(self.home,'cases',exp_relpath.lstrip('/').split(self.csc)[0])]
-            self._exp_args["post"]["plot_output"]=[os.path.join(self.home,'casesplots',exp_relpath.lstrip('/').split(self.csc)[0])]
+            self._exp_args["verif"]["verif_path"]=[os.path.join(self.rdss_path,exp_relpath.lstrip('/').split(self.csc)[0])]
+            self._exp_args["post"]["plot_output"]=[os.path.join(self.pngs_path,exp_relpath.lstrip('/').split(self.csc)[0])]
             self._exp_args["scorecards"]["ref_model"]=[self.ref_name]
             self._exp_args["scorecards"]["fcst_model"]=[self.csc_resol]
             if write==True:

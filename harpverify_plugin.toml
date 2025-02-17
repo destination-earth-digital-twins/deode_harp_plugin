@@ -30,6 +30,8 @@
   ECFS_ARCHIVE_RELPATH="/deode/HARP_VERIF/cases/"
   DCMDB_DIR="/home/sp3c/deode_project/dcmdb/"
   DW_DIR="/home/sp3c/deode_project/Deode-Workflow"
+  RDSS_PATH="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/cases/iekm/"
+  PNGS_PATH="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/casesplots/iekm/"
 
 [submission.harpverify_group.MODULES]
   ECFLOW = ["load", "ecflow"]

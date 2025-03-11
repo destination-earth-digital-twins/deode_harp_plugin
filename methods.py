@@ -22,11 +22,11 @@ class ConfigHarpverify(object):
 
         """
         self.config = config
-        self.home = os.environ.get("VERIF_HOME")
-        self.huser = os.environ.get("HUSER")
-        self.duser= os.environ.get("DUSER")
-        self.harpscripts_home=os.environ.get("HARPSCRIPTS_HOME")
-        self.platform = Platform(config)      
+        self.platform = Platform(config)
+        self.home = self.platform.get_value("submission.harpverify_group.ENV.VERIF_HOME")
+        self.huser = self.platform.get_value("submission.harpverify_group.ENV.HUSER")
+        self.duser= self.platform.get_value("submission.harpverify_group.ENV.DUSER")
+        self.harpscripts_home=self.platform.get_value("submission.harpverify_group.ENV.HARPSCRIPTS_HOME")
         self.cnmexp = self.config["general.cnmexp"]
         self.csc = self.config["general.csc"]
         self.cycle = self.config["general.cycle"]
@@ -45,16 +45,16 @@ class ConfigHarpverify(object):
         self.exp = self._set_exp()
         self.case = self.platform.get_value("general.case")
         self.sqlites_exp_path=self.platform.get_value("extractsqlite.sqlite_path")
-        self.sqlites_ref_path=os.environ.get("REF_SQLITES")
-        self.sqlites_obs_path=os.environ.get("OBSTABLES_PATH")
-        self.rdss_path=os.environ.get("RDSS_PATH")
-        self.pngs_path=os.environ.get("PNGS_PATH")
-        self.ref_name=os.environ.get("REF_NAME")
+        self.sqlites_ref_path=self.platform.get_value("submission.harpverify_group.ENV.REF_SQLITES")
+        self.sqlites_obs_path=self.platform.get_value("submission.harpverify_group.ENV.OBSTABLES_PATH")
+        self.rdss_path=self.platform.get_value("submission.harpverify_group.ENV.RDSS_PATH")
+        self.pngs_path=self.platform.get_value("submission.harpverify_group.ENV.PNGS_PATH")
+        self.ref_name=self.platform.get_value("submission.harpverify_group.ENV.REF_NAME")
         self._case_args = None
         self._exp_args = None
         self.config_yaml = None
         self.config_yaml_filename = None
-        self.ecfs_archive_relpath = os.environ.get("ECFS_ARCHIVE_RELPATH")
+        self.ecfs_archive_relpath = self.platform.get_value("submission.harpverify_group.ENV.ECFS_ARCHIVE_RELPATH")
         self.csc_resol=self.config["general.csc"]+'_'+str(self.config["domain.xdx"])+'m'
 
     def write_config_yml(self,write=True):

@@ -2,6 +2,8 @@
   harpverify = "/home/sp3c/deode_project/deode_plugins/"
 [suite_control]
   suite_definition = "HarpverifySuiteDefinition"
+[scheduler.ecfvars]
+  case_prefix = "HARPVERIF_" # Add this to the suite name to not collide with OD case runs.
 [submission]
   submit_types = ["background_vm", "background_hpc", "parallel", "gnu", "serial", "harpverify_group"]
 

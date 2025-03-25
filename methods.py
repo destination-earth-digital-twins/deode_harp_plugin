@@ -57,7 +57,8 @@ class ConfigHarpverify(object):
         self.forecast_range_nr = forecast_range_to_hours(self.forecast_range)
         self.endyyyymmddhh = (datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=self.forecast_range_nr)).strftime("%Y%m%d%H")
         self.exp = self._set_exp()
-        self.case = self.platform.get_value("general.case")
+        self.case_prefix=self.platform.get_value("scheduler.ecfvars.case_prefix")
+        self.case = self.platform.get_value("general.case").removeprefix(self.case_prefix) # Remove case_prefix from suite name to get correct case names.
         self.sqlites_exp_path=self.platform.get_value("extractsqlite.sqlite_path")
         self.sqlites_ref_path=self.platform.get_value("submission.harpverify_group.ENV.REF_SQLITES")
         self.sqlites_obs_path=self.platform.get_value("submission.harpverify_group.ENV.OBSTABLES_PATH")

@@ -15,7 +15,10 @@ To create a verification suite from a config.toml and the harpverify_plugin.toml
 >   /path/to/config.toml
 > 
 >   /path/to/harpverify_plugin.toml
-
+>
+Check for the comments in harpverify_plugin.toml to understand how to set each plugin/user specific variable.
+Specifically, use DUSER=HUSER=your_user and USE_OPERATIONAL_INDEXING=no if you want to run verifcations for one of your cases.
+ 
 Then create and launch the verification suite with these commands: 
 
 > poetry shell
@@ -27,5 +30,8 @@ Then create and launch the verification suite with these commands:
 If everything went fine, a new suite will appear in your ecflow_ui, named just like the deode case, with a family called "Case_point_verification" and tasks to get the verification files, Verify, and save the files conveniently:
 
 ![Screenshot from 2024-10-21 10-59-18](https://github.com/user-attachments/assets/f68f5f10-2488-437b-932d-709bd8914d60)
+
+In addition, for automatizing verifications run by the on-duty team, an auxiliar script script is available (launch_from_dcmdb.py) to read new runs betweeen two dates from dcmdb,
+download the config files and launch all the suites.
 
   

@@ -4,6 +4,9 @@ from pathlib import Path
 import toml
 import re
 from datetime import datetime
+import dcmdb
+from pathlib import Path
+
 
 
 # Load configuration from harpverify_plugin.toml
@@ -22,10 +25,18 @@ START_DATE = sys.argv[2]
 END_DATE = sys.argv[3]
 
 CASES_FILE = os.path.join(VERIF_HOME, "cases_to_verify.yml")
-# Execute dcmdb command to find new runs between dates; make sure dcmdb is updated
+# Interrogate dcmdb to find new runs between dates; NOTE: make sure dcmdb is updated!
 os.chdir(DCMDB_DIR)
-os.system(f"dcmdb chase -list -v | grep -B 2 {DUSER}/DE_NWP > {CASES_FILE}")
-print(f"New experiments to verify have been listed in {CASES_FILE}.")
+collection=dcmdb.collect_cases(path=Path('cases'))
+with open(CASES_FILE, "w") as f:
+    for exp in collection.experiments:
+        print(exp.schema_version)
+        if exp.schema_version == 'v1':
+            f.write(f"{exp.name}\n")
+            f.write(f"File templates : {exp.metadata['runs'][0]['file_templates']}\n")
+            f.write(f"Path template : {exp.metadata['runs'][0]['stores'][0]['path_template']}\n")
+            f.write(f"--\n")
+    print(f"New experiments to verify have been listed in {CASES_FILE}.\n")
 
 # Check if the input file exists
 if not os.path.isfile(CASES_FILE):

@@ -121,8 +121,8 @@ class ConfigHarpverify(object):
                 self._exp_args["post"]["plot_output"]=[os.path.join(self.pngs_path,exp_relpath.lstrip('/').split(self.csc)[0])]
                 self._exp_args["verif"]["fcst_path"]=[local_fctables.split(self.csc)[0]]
             else:
-                self._exp_args["verif"]["verif_path"]=[os.path.join(self.rdss_path,self.case)]
-                self._exp_args["post"]["plot_output"]=[os.path.join(self.pngs_path,self.case)]
+                self._exp_args["verif"]["verif_path"]=[os.path.join(self.rdss_path)]
+                self._exp_args["post"]["plot_output"]=[os.path.join(self.pngs_path)]
                 self._exp_args["verif"]["fcst_path"]=[os.path.join(self.home,f"FCTABLES/",self.case)]
             self._exp_args["scorecards"]["ref_model"]=[self.ref_name]
             self._exp_args["scorecards"]["fcst_model"]=[self.csc_resol]

@@ -21,29 +21,40 @@ class LinkOBSFCTABLES(Task):
 
     def execute(self):
         """link OBSTABLES, FCTABLES from REF and EXPS to path directory or retrieve from ECFS archive"""
-        #sqlites_exp_path is something like this:
-        #/scratch/sp3c/DE_NWP/deode/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/
-
-        #Retain the DEODE relative path to the experiment's gribs and sqlites. 
-        #Extract it from the sqlites_exp_path variable (i.e /YYYY/MM/DD/HH//{type_of_extreme}/{order_of_run}
-        print('sqlites_exp_path')
-        print(self.config_verif.sqlites_exp_path)
-        sqlites_relpath=self.config_verif.sqlites_exp_path.replace(self.config_verif.huser,self.config_verif.duser).split('deode')[1]
-        exp_relpath=sqlites_relpath.split('sqlite')[0]
-        # The lines above should be something like '/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/' (without the last 2 for the second one)
-        exp_scratch=self.config_verif.sqlites_exp_path.replace(self.config_verif.huser,self.config_verif.duser)
-        #The line above should be something like /scratch/aut6432/DE_NWP/deode/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/
-        local_fctables=os.path.join(self.config_verif.home,f"FCTABLES/",exp_relpath.lstrip('/'),self.config_verif.startyyyy,self.config_verif.startmm)
-        #The line above evaluates ~ /ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES//2024/12/03/00//convection/1/HARMONIE_AROME_500m/YYYY/MM/
-        local_fctables_ref=local_fctables.split(self.config_verif.csc)[0] #This is where REF's folder with FCTABLES should be linked
-        #The line above is where the Global_DT FCTABLES should be downloaded or linked for this experiment. It should be something like:
-        #/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES/2024/12/03/00//convection/1/Global_DT
-
+        if self.config_verif.use_operational_indexing=="yes":
+            #sqlites_exp_path is something like this:
+            #/scratch/sp3c/DE_NWP/deode/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/
+            #Retain the DEODE relative path to the experiment's gribs and sqlites. 
+            #Extract it from the sqlites_exp_path variable (i.e /YYYY/MM/DD/HH//{type_of_extreme}/{order_of_run}
+            print('Looking for FCTABLES in sqlites_exp_path:')
+            print(self.config_verif.sqlites_exp_path)
+            sqlites_relpath=self.config_verif.sqlites_exp_path.replace(self.config_verif.huser,self.config_verif.duser).split('deode')[1]
+            exp_relpath=sqlites_relpath.split('sqlite')[0]
+            # The 2 variables above should be something like '/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/' and '/2024/12/03/00//convection/1/HARMONIE_AROME_500m/'
+            exp_scratch=self.config_verif.sqlites_exp_path.replace(self.config_verif.huser,self.config_verif.duser) #we must refer to deode user in case it's different than harp user
+            #The line above should be something like /scratch/aut6432/DE_NWP/deode/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/
+            local_fctables=os.path.join(self.config_verif.home,f"FCTABLES/",exp_relpath.lstrip('/'),self.config_verif.startyyyy,self.config_verif.startmm)
+            #The line above evaluates ~ /ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES//2024/12/03/00//convection/1/HARMONIE_AROME_500m/YYYY/MM/
+            local_fctables_ref=local_fctables.split(self.config_verif.csc)[0] #This is where REF's folder with FCTABLES should be linked
+            #The line above is where the Global_DT FCTABLES should be downloaded or linked for this experiment. It should be something like:
+            #/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES/2024/12/03/00//convection/1/Global_DT
+        else:
+            #sqlites_exp_path is something like this:
+            #/scratch/sp3c/deode/CY49t2_AROME_nwp_DEMO_60x80_2500m_20250209/archive/sqlite/FCTABLE/CY49t2_AROME_nwp_DEMO_60x80_2500m_20250209/2025/02
+            sqlites_relpath=self.config_verif.sqlites_exp_path.split('deode')[1]
+            yyyy_mm_string=str(self.config_verif.startyyyy)+'/'+str(self.config_verif.startmm) # get that 2025/02 part to get exp_scratch in the next line:
+            exp_scratch=self.config_verif.sqlites_exp_path.replace(self.config_verif.huser,self.config_verif.duser) #we must refer to deode user in case it's different than harp user 
+            #Construct local_fctables:
+            local_fctables=os.path.join(self.config_verif.home,f"FCTABLES/",self.config_verif.case,self.config_verif.csc_resol,self.config_verif.startyyyy,self.config_verif.startmm)
+            #Construct local_fctables_ref:
+            local_fctables_ref=os.path.join(self.config_verif.home,f"FCTABLES/",self.config_verif.case) #This is where REF's folder with FCTABLES should be linked
+            exp_relpath=sqlites_relpath.split('sqlite')[0]    
         #Now, check if the experiment still exists in the $SCRATCH from DEODE's operational user 
         #(replace from huser to duser was needed because the config file is parsed from the local user
-        print('checking if exists:'+exp_scratch)
+        print('checking if exists: '+exp_scratch)
+        print('sqlites_relpath: ' + sqlites_relpath)
+        print('exp_relpath: '+exp_relpath)
         #This should be improved because e.g. if the link to the duser directory exists but is not filled anymore, it will fail.
-
         if os.path.exists(exp_scratch) and os.listdir(exp_scratch):   #If the experiment path in scratch exists and has files on it (presumably FCTABLE)
             if not (os.path.exists(local_fctables) and os.listdir(local_fctables)):
              print(f"The path '{local_fctables}' does not exist or is empty.")
@@ -57,10 +68,12 @@ class LinkOBSFCTABLES(Task):
                  if os.path.isfile(source_path) and not os.path.exists(target_path):
                   os.symlink(source_path, target_path)
             else:
-             print('link to FCTABLES for case exp exists already, linking command skipped') 
-        else:
-           ecfs_exp_sqlites_path=os.path.join('ec:..',self.config_verif.duser,'DE_NWP/deode',sqlites_relpath.split('sqlite')[0].lstrip('/'),'*sqlite')
+             print('links to FCTABLES for case exp exist already, linking commands skipped') 
+        else:  #If the experiment path in scratch does not exist or is empty, get the FCTABLES from ECFS archive:
+           #ecfs_exp_sqlites_path=os.path.join('ec:..',self.config_verif.duser,self.config_verif.ecfs_archive_relpath_deodeoutput,sqlites_relpath.split('sqlite')[0].lstrip('/'),'*sqlite')
+           ecfs_exp_sqlites_path='ec:..' + os.sep + self.config_verif.duser + os.path.join(self.config_verif.ecfs_archive_relpath_deodeoutput,self.config_verif.case,self.config_verif.ecfs_archive_sqlites,'*sqlite')
            print('making dir for FCTABLES and downloading from ecfs:')
+           print(self.config_verif.duser)
            print(local_fctables)
            print(ecfs_exp_sqlites_path)
            try:

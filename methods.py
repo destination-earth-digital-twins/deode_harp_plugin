@@ -21,11 +21,25 @@ class ConfigHarpverify(object):
             config (deode.ParsedConfig): Configuration
 
         """
+        def forecast_range_to_hours(forecast_range):
+            match = re.fullmatch(r'P(\d+)D|PT(\d+)H', forecast_range)
+            if match:
+                days = match.group(1)
+                hours = match.group(2)
+                
+                if days:
+                    return int(days) * 24  # Convert days to hours
+                elif hours:
+                    return int(hours)  # Already in hours
+            raise ValueError(f"Invalid forecast_range format: {forecast_range}")
+
         self.config = config
         self.platform = Platform(config)
         self.home = self.platform.get_value("submission.harpverify_group.ENV.VERIF_HOME")
         self.huser = self.platform.get_value("submission.harpverify_group.ENV.HUSER")
         self.duser= self.platform.get_value("submission.harpverify_group.ENV.DUSER")
+        self.obs_step= self.platform.get_value("submission.harpverify_group.ENV.OBS_STEP")
+        self.use_operational_indexing= self.platform.get_value("submission.harpverify_group.ENV.USE_OPERATIONAL_INDEXING")
         self.harpscripts_home=self.platform.get_value("submission.harpverify_group.ENV.HARPSCRIPTS_HOME")
         self.cnmexp = self.config["general.cnmexp"]
         self.csc = self.config["general.csc"]
@@ -37,11 +51,11 @@ class ConfigHarpverify(object):
         self.startyyyy=datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y")
         self.startmm=datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ").strftime("%m")
         self.startdd=datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ").strftime("%d")
-        #self.endyyyymmddhh=datetime.strptime(self.end, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y%m%d%H")
-        #self.endyyyymmddhh = (datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=int(self.forecast_range.replace("PT", "").replace("h", "")))).strftime("%Y%m%d%H")
         self.cycle_length = self.platform.get_value("general.times.cycle_length")
         self.forecast_range = self.platform.get_value("general.times.forecast_range")
-        self.endyyyymmddhh = (datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=int(re.sub(r"\D", "", self.forecast_range)))).strftime("%Y%m%d%H")
+        self.cycle_length_nr = forecast_range_to_hours(self.cycle_length)
+        self.forecast_range_nr = forecast_range_to_hours(self.forecast_range)
+        self.endyyyymmddhh = (datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=self.forecast_range_nr)).strftime("%Y%m%d%H")
         self.exp = self._set_exp()
         self.case = self.platform.get_value("general.case")
         self.sqlites_exp_path=self.platform.get_value("extractsqlite.sqlite_path")
@@ -54,7 +68,9 @@ class ConfigHarpverify(object):
         self._exp_args = None
         self.config_yaml = None
         self.config_yaml_filename = None
-        self.ecfs_archive_relpath = self.platform.get_value("submission.harpverify_group.ENV.ECFS_ARCHIVE_RELPATH")
+        self.ecfs_archive_sqlites=self.platform.get_value("archiving.hour.ecfs.sqlite.outpath")
+        self.ecfs_archive_relpath_deodeoutput = self.platform.get_value("submission.harpverify_group.ENV.ECFS_ARCHIVE_RELPATH_DEODEOUTPUT")
+        self.ecfs_archive_relpath_harpoutput = self.platform.get_value("submission.harpverify_group.ENV.ECFS_ARCHIVE_RELPATH_HARPOUTPUT")
         self.csc_resol=self.config["general.csc"]+'_'+str(self.config["domain.xdx"])+'m'
 
     def write_config_yml(self,write=True):
@@ -68,28 +84,45 @@ class ConfigHarpverify(object):
         self.config_yaml_filename = os.path.join(self.home, f"config_files/",self.startyyyy,self.startmm,self.startdd,f"deode_conf_{self.case}.yml")
         print("config_template es")
         print(config_template)
-        
-        #These lines come from linkobsfctables.py and are adapted here to fill the config file for harp's R script
-        #Extract it from the sqlites_exp_path variable (i.e /YYYY/MM/DD/HH//{type_of_extreme}/{order_of_run}
-        sqlites_relpath=self.sqlites_exp_path.replace(self.huser,self.duser).split('deode')[1]
-        exp_relpath=sqlites_relpath.split('sqlite')[0]
-        # The lines above should be something like '/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/' (without the last 2 for the second one)
-        exp_scratch=self.sqlites_exp_path.replace(self.huser,self.duser)
-        #The line above should be something like /scratch/aut6432/DE_NWP/deode/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/
-        local_fctables=os.path.join(self.home,f"FCTABLES/",exp_relpath.lstrip('/'),self.startyyyy,self.startmm)
-        #The line above evaluates ~ /ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES//2024/12/03/00//convection/1/HARMONIE_AROME_500m/YYYY/MM/
-        local_fctables_ref=local_fctables.split(self.csc)[0] #This is where REF's folder with FCTABLES should be linked
-        #The line above is where the Global_DT FCTABLES should be downloaded or linked for this experiment. It should be something like:
-        #/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES/2024/12/03/00//convection/1/Global_DT
 
+
+        #These lines come from linkobsfctables.py and are adapted here to fill the config file for harp's R script
+        if self.use_operational_indexing=="yes":
+            #Extract it from the sqlites_exp_path variable (i.e /YYYY/MM/DD/HH//{type_of_extreme}/{order_of_run}
+            sqlites_relpath=self.sqlites_exp_path.replace(self.huser,self.duser).split('deode')[1]
+            exp_relpath=sqlites_relpath.split('sqlite')[0]
+            # The lines above should be something like '/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/' (without the last 2 for the second one)
+            exp_scratch=self.sqlites_exp_path.replace(self.huser,self.duser)
+            #The line above should be something like /scratch/aut6432/DE_NWP/deode/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/
+            local_fctables=os.path.join(self.home,f"FCTABLES/",exp_relpath.lstrip('/'),self.startyyyy,self.startmm)
+            #The line above evaluates ~ /ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES//2024/12/03/00//convection/1/HARMONIE_AROME_500m/YYYY/MM/
+            local_fctables_ref=local_fctables.split(self.csc)[0] #This is where REF's folder with FCTABLES should be linked
+            #The line above is where the Global_DT FCTABLES should be downloaded or linked for this experiment. It should be something like:
+            #/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES/2024/12/03/00//convection/1/Global_DT
+        else:
+            #sqlites_exp_path is something like this:
+            #/scratch/sp3c/deode/CY49t2_AROME_nwp_DEMO_60x80_2500m_20250209/archive/sqlite/FCTABLE/CY49t2_AROME_nwp_DEMO_60x80_2500m_20250209/2025/02
+            sqlites_relpath=self.sqlites_exp_path
+            yyyy_mm_string=str(self.startyyyy)+'/'+str(self.startmm) # get that 2025/02 part to get exp_scratch in the next line:
+            exp_scratch=self.sqlites_exp_path.replace(self.huser,self.duser) #we must refer to deode user in case it's different than harp user 
+            #Construct local_fctables:
+            local_fctables=os.path.join(self.home,f"FCTABLES/",self.case,self.case,self.startyyyy,self.startmm)
+            #Construct local_fctables_ref:
+            local_fctables_ref=os.path.join(self.home,f"FCTABLES/",self.case) #This is where REF's folder with FCTABLES should be linked    
         if os.path.isfile(config_template):
             self._exp_args = ConfigHarpverify.load_yaml(config_template)
             self._exp_args["verif"]["fcst_model"]=[self.ref_name,self.csc_resol]
             self._exp_args["verif"]["project_name"]=[self.case]
-            self._exp_args["verif"]["fcst_path"]=[local_fctables.split(self.csc)[0]]
+            self._exp_args["verif"]["lead_time"]= f"seq(0,{self.forecast_range_nr},{self.obs_step})"
             self._exp_args["verif"]["obs_path"]=[self.home + '/OBSTABLESOPER/']
-            self._exp_args["verif"]["verif_path"]=[os.path.join(self.rdss_path,exp_relpath.lstrip('/').split(self.csc)[0])]
-            self._exp_args["post"]["plot_output"]=[os.path.join(self.pngs_path,exp_relpath.lstrip('/').split(self.csc)[0])]
+            if self.use_operational_indexing=="yes":
+                self._exp_args["verif"]["verif_path"]=[os.path.join(self.rdss_path,exp_relpath.lstrip('/').split(self.csc)[0])]
+                self._exp_args["post"]["plot_output"]=[os.path.join(self.pngs_path,exp_relpath.lstrip('/').split(self.csc)[0])]
+                self._exp_args["verif"]["fcst_path"]=[local_fctables.split(self.csc)[0]]
+            else:
+                self._exp_args["verif"]["verif_path"]=[os.path.join(self.rdss_path,self.case)]
+                self._exp_args["post"]["plot_output"]=[os.path.join(self.pngs_path,self.case)]
+                self._exp_args["verif"]["fcst_path"]=[os.path.join(self.home,f"FCTABLES/",self.case)]
             self._exp_args["scorecards"]["ref_model"]=[self.ref_name]
             self._exp_args["scorecards"]["fcst_model"]=[self.csc_resol]
             if write==True:
@@ -131,7 +164,9 @@ class ConfigHarpverify(object):
              data_loaded = yaml.load(stream, Loader=yaml.SafeLoader)
         return data_loaded
     @staticmethod
-    def save_yaml(config_file, data):												
+    def save_yaml(config_file, data):
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(config_file), exist_ok=True)												
         with open(config_file, "w") as stream:
              yaml.dump(data, stream, default_flow_style=False, sort_keys=False)
     @staticmethod
@@ -178,3 +213,4 @@ class ConfigHarpverify(object):
                     print(f"Copied file: {local_file} to {ec_target_file}")
                 except subprocess.CalledProcessError as e:
                     print(f"Error copying file {local_file} to {ec_target_file}: {e}")
+

@@ -36,6 +36,9 @@ class Verification(Task):
         end_date=self.config_verif.endyyyymmddhh
         harp_scripts=self.config_verif.harpscripts_home
         print(harp_scripts)
+        print(os.getenv("HOME"))
         os.chdir(harp_scripts)
-        self.batch.run(f"{harp_scripts}/verification/point_verif.R -config_file {config_yaml_filename} -start_date {start_date} -end_date {start_date} -params_list=T2m,S10m,D10m,Pmsl,CCtot,S,D,RH,T,Gmax,Pcp")
+        self.batch.run(f"{harp_scripts}/verification/point_verif.R -config_file {config_yaml_filename} -start_date {start_date} -end_date {start_date} -params_list=T2m,S10m,D10m,Pmsl,CCtot,S,D,RH,T,Pcp,Gmax")
+
+
 

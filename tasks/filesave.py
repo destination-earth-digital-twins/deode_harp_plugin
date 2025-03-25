@@ -44,11 +44,11 @@ class Filesave(Task):
         os.chdir(harp_scripts)
         print(verif_path)
         print(case)
-        print(self.config_verif.ecfs_archive_relpath)
+        print(self.config_verif.ecfs_archive_relpath_harpoutput)
         print(self.config_verif.huser)
-        print(' copying files from' + str(os.path.join(verif_path,case))+ ' to ec:../'+self.config_verif.huser + '/'+os.path.join(self.config_verif.huser,self.config_verif.ecfs_archive_relpath,exp_relpath.lstrip('/')))
-        self.config_verif.replicate_structure_to_ec(os.path.join(verif_path,case),'ec:../'+self.config_verif.huser + '/'+os.path.join(self.config_verif.huser,self.config_verif.ecfs_archive_relpath,exp_relpath.lstrip('/')))
+        print(' copying files from' + str(os.path.join(verif_path,case))+ ' to ec:../'+self.config_verif.huser + '/'+os.path.join(self.config_verif.huser,self.config_verif.ecfs_archive_relpath_harpoutput,exp_relpath.lstrip('/')))
+        self.config_verif.replicate_structure_to_ec(os.path.join(verif_path,case),'ec:../'+self.config_verif.huser + '/'+os.path.join(self.config_verif.huser,self.config_verif.ecfs_archive_relpath_harpoutput,exp_relpath.lstrip('/')))
         
-        print(' copying files from' + str(os.path.join(plot_output,case))+ ' to ec:../'+self.config_verif.huser + '/'+os.path.join(self.config_verif.huser,self.config_verif.ecfs_archive_relpath,exp_relpath.lstrip('/')))
-        self.config_verif.replicate_structure_to_ec(os.path.join(plot_output,case),'ec:../'+self.config_verif.huser + '/'+os.path.join(self.config_verif.huser,self.config_verif.ecfs_archive_relpath,exp_relpath.lstrip('/')))
+        print(' copying files from' + str(os.path.join(plot_output,case))+ ' to ec:../'+self.config_verif.huser + '/'+os.path.join(self.config_verif.huser,self.config_verif.ecfs_archive_relpath_harpoutput,exp_relpath.lstrip('/')))
+        self.config_verif.replicate_structure_to_ec(os.path.join(plot_output,case),'ec:../'+self.config_verif.huser + '/'+os.path.join(self.config_verif.huser,self.config_verif.ecfs_archive_relpath_harpoutput,exp_relpath.lstrip('/')))
 

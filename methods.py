@@ -112,7 +112,7 @@ class ConfigHarpverify(object):
             local_fctables_ref=os.path.join(self.home,f"FCTABLES/",self.case) #This is where REF's folder with FCTABLES should be linked    
         if os.path.isfile(config_template):
             self._exp_args = ConfigHarpverify.load_yaml(config_template)
-            self._exp_args["verif"]["fcst_model"]=[self.ref_name,self.csc_resol]
+            self._exp_args["verif"]["fcst_model"]=list(self.ref_name) + [self.csc_resol]
             self._exp_args["verif"]["project_name"]=[self.case]
             self._exp_args["verif"]["lead_time"]= f"seq(0,{self.forecast_range_nr},{self.obs_step})"
             self._exp_args["verif"]["obs_path"]=[self.home + '/OBSTABLESOPER/']
@@ -124,7 +124,7 @@ class ConfigHarpverify(object):
                 self._exp_args["verif"]["verif_path"]=[os.path.join(self.rdss_path)]
                 self._exp_args["post"]["plot_output"]=[os.path.join(self.pngs_path)]
                 self._exp_args["verif"]["fcst_path"]=[os.path.join(self.home,f"FCTABLES/",self.case)]
-            self._exp_args["scorecards"]["ref_model"]=[self.ref_name]
+            self._exp_args["scorecards"]["ref_model"]=[self.ref_name[0]]
             self._exp_args["scorecards"]["fcst_model"]=[self.csc_resol]
             if write==True:
                ConfigHarpverify.save_yaml(self.config_yaml_filename, self._exp_args)

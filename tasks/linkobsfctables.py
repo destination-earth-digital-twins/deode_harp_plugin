@@ -70,8 +70,10 @@ class LinkOBSFCTABLES(Task):
             else:
              print('links to FCTABLES for case exp exist already, linking commands skipped') 
         else:  #If the experiment path in scratch does not exist or is empty, get the FCTABLES from ECFS archive:
-           #ecfs_exp_sqlites_path=os.path.join('ec:..',self.config_verif.duser,self.config_verif.ecfs_archive_relpath_deodeoutput,sqlites_relpath.split('sqlite')[0].lstrip('/'),'*sqlite')
-           ecfs_exp_sqlites_path='ec:..' + os.sep + self.config_verif.duser + os.path.join(self.config_verif.ecfs_archive_relpath_deodeoutput,self.config_verif.case,self.config_verif.ecfs_archive_sqlites,'*sqlite')
+           if self.config_verif.use_operational_indexing=="yes":
+             ecfs_exp_sqlites_path='ec:..' + os.sep + self.config_verif.duser + os.path.join(self.config_verif.ecfs_archive_relpath_deodeoutput,sqlites_relpath.split('sqlite')[0].lstrip('/'),'*sqlite')
+           else:  
+             ecfs_exp_sqlites_path='ec:..' + os.sep + self.config_verif.duser + os.path.join(self.config_verif.ecfs_archive_relpath_deodeoutput,self.config_verif.case,self.config_verif.ecfs_archive_sqlites,'*sqlite')
            print('making dir for FCTABLES and downloading from ecfs:')
            print(self.config_verif.duser)
            print(local_fctables)
@@ -85,11 +87,13 @@ class LinkOBSFCTABLES(Task):
            except Exception as e:
               print(f"An error occurred: {e}")
            subprocess.run(["ecp", ecfs_exp_sqlites_path, local_fctables], check=True)           
-        if os.path.exists(os.path.join(self.config_verif.sqlites_ref_path,self.config_verif.ref_name)):
+
+        for ref_model in self.config_verif.ref_name:
+           if os.path.exists(os.path.join(self.config_verif.sqlites_ref_path,ref_model)):
              print('linking FCTABLES for REF exp...')
-             if not os.path.exists(os.path.join(local_fctables_ref,self.config_verif.ref_name)): # If linked folder does not exist
+             if not os.path.exists(os.path.join(local_fctables_ref,ref_model)): # If linked folder does not exist
                     print('linking FCTABLES path for REF exp...')
-                    source_path = os.path.join(self.config_verif.sqlites_ref_path, self.config_verif.ref_name)
+                    source_path = os.path.join(self.config_verif.sqlites_ref_path,ref_model)
                     destination_folder = local_fctables_ref
                     # Ensure the destination is a directory
                     if not os.path.isdir(destination_folder):

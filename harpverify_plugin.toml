@@ -23,20 +23,20 @@
 
 [submission.harpverify_group.ENV]
   DEODE = "awesome"
-  DUSER = "sp3c"   # DEODE User: who ran the DEODE case
+  DUSER = "aut6432"   # DEODE User: who ran the DEODE case
   HUSER = "sp3c"   # HARP User : who runs the HARP verification 
   HARPSCRIPTS_HOME = "/home/sp3c/deode_project/oper-harp-verif/" # Path to your HARP SCRIPTS installation
   VERIF_HOME= "/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/" # Root path for HARP results, config files, OBSTABLES and FCTABLES...
-  REF_SQLITES="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLE/" # Where to find sqlites for the Reference model
+  REF_SQLITES="/ec/res4/hpcperm/aut6432/DE_Verification/FCTABLES/" # Where to find sqlites for the reference models
   OBSTABLES_PATH="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/OBSTABLE_MERGED/"
-  REF_NAME="Global_DT" # Name of your Reference model
+  REF_NAME=["GDT_iekm","IFS"] # Names of your reference models
   ECFS_ARCHIVE_RELPATH_HARPOUTPUT="/deode/HARP_VERIF/cases/" # Root to store the HARP results in permanent archive
-  ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/deode/" #Normally /deode/ for generic users, /DE_NWP/deode/ for operational (aut6432)
+  ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/DE_NWP/deode/" #Normally /deode/ for generic users, /DE_NWP/deode/ for operational (aut6432)
   DCMDB_DIR="/home/sp3c/deode_project/dcmdb/" #DCMDB installation. Only used if running the batch script for On-duty runs at once
   DW_DIR="/home/sp3c/deode_project/Deode-Workflow" # Deode-Workflow installation
   RDSS_PATH="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/cases/iekm/" # Path to store your HARP results (in subfolders for each case)
   PNGS_PATH="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/casesplots/iekm/" # Path to store your HARP figures (in subfolders for each case)
-  USE_OPERATIONAL_INDEXING="no" # Wether to use the Operational indexing (use in combination with operational DUSER=aut6432)
+  USE_OPERATIONAL_INDEXING="no" # Whether to use the Operational indexing (use in combination with operational DUSER=aut6432)
   OBS_STEP=3 # Frequecy of observations. Use 1 or 3 hours, tipically
 
 [submission.harpverify_group.MODULES]
@@ -50,3 +50,11 @@
   WALLTIME = "#SBATCH --time=03:00:00"
 [submission.task_exceptions.Filesave.BATCH]
   WALLTIME = "#SBATCH --time=03:00:00"
+
+
+[boundaries]
+  bdmodel = "ifs"  # Might be needed when verifying cases run using DW before v0.13.0
+
+[boundaries.ifs]
+  bdmember = []    # Might be needed when verifying cases run using DW before v0.13.0
+

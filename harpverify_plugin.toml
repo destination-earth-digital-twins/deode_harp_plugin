@@ -23,15 +23,16 @@
 
 [submission.harpverify_group.ENV]
   DEODE = "awesome"
-  DUSER = "aut6432"   # DEODE User: who ran the DEODE case
+  DUSER = "rm6"   # DEODE User: who ran the DEODE case
   HUSER = "sp3c"   # HARP User : who runs the HARP verification 
   HARPSCRIPTS_HOME = "/home/sp3c/deode_project/oper-harp-verif/" # Path to your HARP SCRIPTS installation
   VERIF_HOME= "/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/" # Root path for HARP results, config files, OBSTABLES and FCTABLES...
   REF_SQLITES="/ec/res4/hpcperm/aut6432/DE_Verification/FCTABLES/" # Where to find sqlites for the reference models
-  OBSTABLES_PATH="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/OBSTABLE_MERGED/"
+  #OBSTABLES_PATH="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/OBSTABLE_MERGED/"
+  OBSTABLES_PATH="/ec/res4/hpcperm/aut6432/DE_Verification/OBSTABLES/"
   REF_NAME=["GDT_iekm","IFS"] # Names of your reference models
   ECFS_ARCHIVE_RELPATH_HARPOUTPUT="/deode/HARP_VERIF/cases/" # Root to store the HARP results in permanent archive
-  ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/DE_NWP/deode/" #Normally /deode/ for generic users, /DE_NWP/deode/ for operational (aut6432)
+  ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/deode/" #Normally /deode/ for generic users, /DE_NWP/deode/ for operational (aut6432)
   DCMDB_DIR="/home/sp3c/deode_project/dcmdb/" #DCMDB installation. Only used if running the batch script for On-duty runs at once
   DW_DIR="/home/sp3c/deode_project/Deode-Workflow" # Deode-Workflow installation
   RDSS_PATH="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/cases/iekm/" # Path to store your HARP results (in subfolders for each case)
@@ -52,9 +53,9 @@
   WALLTIME = "#SBATCH --time=03:00:00"
 
 
-[boundaries]
-  bdmodel = "ifs"  # Might be needed when verifying cases run using DW before v0.13.0
+#[boundaries]
+#  bdmodel = "ifs"  # Might be needed when verifying cases run using DW before v0.13.0
 
-[boundaries.ifs]
-  bdmember = []    # Might be needed when verifying cases run using DW before v0.13.0
+#[boundaries.ifs]
+#  bdmember = []    # Might be needed when verifying cases run using DW before v0.13.0
 

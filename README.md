@@ -35,6 +35,9 @@ After setting your harpverify_plugin.toml correctly, create and launch the verif
 > deode case ?configuration -o verification_suite.toml
 > 
 > deode start suite --config-file verification_suite.tom
+>
+Or, alternatively, use the launch_from_user.py script like this:
+python3 lauch_from_user.py path_to_harpverify_plugin.toml deode_user experiment_name yyyy mm dd
 
 If everything went fine, a new suite will appear in your ecflow_ui, named just like the deode case, with a family called "Case_point_verification" and tasks to get the verification files, Verify, and save the files conveniently:
 

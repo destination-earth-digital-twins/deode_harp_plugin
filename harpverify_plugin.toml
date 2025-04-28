@@ -5,7 +5,7 @@
 [suite_control]
   suite_definition = "HarpverifySuiteDefinition"
 [scheduler.ecfvars]
-  case_prefix = "HARPVERIF_" # Add this to the suite name to not collide with OD case runs.
+  case_prefix = "DE_Verification_point" # Add this to the suite name to not collide with OD case runs.
   ecf_host = "ecflow-gen-sp3c-001" # Hardcode your ecflow server (needed after v0.12.0)
 [submission]
   submit_types = ["background_vm", "background_hpc", "parallel", "gnu", "serial", "harpverify_group"]

@@ -62,23 +62,55 @@ Finally, for solving some discrepancies with model units of a few variables betw
 NOTE: The verification plugin looks for the information stored in the TOML config file of the case to verify and creates a verification suite plugin using the Deode-Workflow. It is highly recommended that the Deode-Workflow version (tag or commmit) installed in your system is the same as the one used to run the DEODE case. 
 
 After setting your harpverify_plugin.toml correctly, create and launch the verification suite with these commands: 
-> poetry shell (or, for more recent DW installs, `poetry env activate` + source the output of the previous command
-> 
-> deode case ?configuration -o verification_suite.toml
-> 
-> deode start suite --config-file verification_suite.tom
->
+```
+ poetry shell (or, for more recent DW installs, `poetry env activate` + source the output of the previous command
+ 
+ deode case ?configuration -o verification_suite.toml
+ 
+ deode start suite --config-file verification_suite.tom
+
+```
 ## Automatic scripts
 
 ### For single verifications 
-launch_from_user.py is a script to run a single verification of a DEODE experiment run by yourself or some other user. Make sure to set ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/deode/" in harpverify_plugin.toml. The script is run like this:
-python3 lauch_from_user.py path/to/harpverify_plugin.toml deode_user experiment_name yyyy mm dd
+launch_from_user.py is a script to run a single verification of a DEODE experiment run by yourself or some other user. This can be use to verify your runs or some colleague's runs. 
+For this purpose, make sure to set ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/deode/" and USE_OPERATIONAL_INDEXING="no" in harpverify_plugin.toml.
+It can also be used to run a single verification ran by the on-duty team (typically using the operational account, currently aut6432 on ATOS), setting "/DE_NWP/deode/" and "yes" in the previous two variables.
+The script is run like this:
+```
+ python3 launch_from_user.py -h
+usage: python3 launch_from_user.py [-h] [--event_type EVENT_TYPE] [--order ORDER] [--csc_res CSC_RES] config_file deode_user experiment year month day
+
+Prepare and submit harpverify experiments using DEODE.
+
+positional arguments:
+  config_file           Path to harpverify_plugin.toml
+  deode_user            DEODE user
+  experiment            Experiment name
+  year                  Year (YYYY)
+  month                 Month (MM)
+  day                   Day (DD)
+
+options:
+  -h, --help            show this help message and exit
+  --event_type EVENT_TYPE
+                        Event type (required if indexing is 'yes')
+  --order ORDER         Order (required if indexing is 'yes')
+  --csc_res CSC_RES     CSC resolution (required if indexing is 'yes')
+```
 Where experiment_name is generally the name of the suite of the case run with DW, which is also the name used to store the run in ec:../{deode_user}deode/
+The three optional arguments are to be used when verifying aut6432's indexed runs: refer to dcmdb or to the weekly logs by the on-duty team to get info about these runs.
 If everything went fine, a new suite will appear in your ecflow_ui, named just like the deode case, with a family called "Case_point_verification" and tasks to get the verification files, Verify, and save the files conveniently:
 
 ![Screenshot from 2024-10-21 10-59-18](https://github.com/user-attachments/assets/f68f5f10-2488-437b-932d-709bd8914d60)
 
 ### For running verifications indexed in dcmdb
-In addition, for automatizing verifications run by the on-duty team, an auxiliar script script is available (launch_from_dcmdb.py) to read new runs betweeen two dates from dcmdb,
+In addition, for automatizing verifications run by the on-duty team, an auxiliar script is available (launch_from_dcmdb.py) to read new runs betweeen two dates from dcmdb,
 download the config files and launch all the suites. Make sure that [dcmdb](https://github.com/destination-earth-digital-twins/dcmdb) is installed in your system. The script is run like this:
+```
 launch_from_dcmdb.py path/to/harpverify_plugin.toml start_date end_date
+```
+Finally , it must be noted that, since these verifications are configured from the original toml files that ran the case, and the plugin makes use of the DW scripting system, it is highly recommended to use the same DW tag that originally ran the OD case.
+Otherwise, very often something will go wrong when creating the suites, given the very dynamic evolution of the DW. To know which tag was used for a specific OD case, look for "describe" in its config.toml file
+
+

@@ -38,8 +38,7 @@ class Verification(Task):
         print(harp_scripts)
         print(os.getenv("HOME"))
         os.chdir(harp_scripts)
-        #self.batch.run(f"{harp_scripts}/verification/point_verif.R -config_file {config_yaml_filename} -start_date {start_date} -end_date {start_date} -params_list=T2m,S10m,D10m,Pmsl,CCtot,S,D,RH,T,Pcp,Gmax,AccPcp1h,AccPcp3h,AccPcp6h,AccPcp12h,AccPcp24h")
-        self.batch.run(f"{harp_scripts}/verification/point_verif.R -config_file {config_yaml_filename} -start_date {start_date} -end_date {start_date} -params_list=T2m,S10m,D10m,Pmsl,CCtot,S,D,RH,T,Pcp,Gmax")
+        self.batch.run(f"{harp_scripts}/verification/point_verif.R -config_file {config_yaml_filename} -start_date {start_date} -end_date {start_date} -params_list=T2m,S10m,D10m,Pmsl,CCtot,S,D,RH,T,Pcp,Gmax,AccPcp1h,AccPcp3h,AccPcp6h,AccPcp12h,AccPcp24h")
 
 
 

@@ -11,13 +11,11 @@ Plugin interface to run harp point verification for deode extreme weather cases.
 This plugin needs the config.toml file from the deode run that you want to verify as input. Relevant configuration of the verification paths, etc. must be updated in the file harpverify_plugin.toml. 
 
 To create a verification suite from a config.toml and the harpverify_plugin.toml file, create a file -e.g. called configuration- in the Deode-Workflow home directory, with the following content:
-
-> --config-file
-> 
->   /path/to/config.toml
-> 
->   /path/to/harpverify_plugin.toml
->
+```
+--config-file
+  /path/to/config.toml
+  /path/to/harpverify_plugin.toml
+```
 Check for the comments in harpverify_plugin.toml to understand how to set each plugin/user specific variable:
 ```
 [general.plugin_registry.plugins]
@@ -73,9 +71,11 @@ After setting your harpverify_plugin.toml correctly, create and launch the verif
 ## Automatic scripts
 
 ### For single verifications 
-launch_from_user.py is a script to run a single verification of a DEODE experiment run by yourself or some other user. This can be use to verify your runs or some colleague's runs. 
-For this purpose, make sure to set ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/deode/" and USE_OPERATIONAL_INDEXING="no" in harpverify_plugin.toml.
-It can also be used to run a single verification ran by the on-duty team (typically using the operational account, currently aut6432 on ATOS), setting "/DE_NWP/deode/" and "yes" in the previous two variables.
+The script launch_from_user.py can be used to run a single verification of a DEODE experiment run by yourself or some other user. It automatically writes the configuration file and launches the verification suite. This can be use to verify your runs or some colleague's runs. 
+For this purpose, make sure to set ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/deode/" and USE_OPERATIONAL_INDEXING="no" in harpverify_plugin.toml. Make sure to have your poetry environment activated for DW.
+
+This script can also be used to run a single verification ran by the on-duty team (typically using the operational account, currently aut6432 on ATOS), setting "/DE_NWP/deode/" and "yes" in the previous two variables.
+
 The script is run like this:
 ```
  python3 launch_from_user.py -h
@@ -98,8 +98,10 @@ options:
   --order ORDER         Order (required if indexing is 'yes')
   --csc_res CSC_RES     CSC resolution (required if indexing is 'yes')
 ```
-Where experiment_name is generally the name of the suite of the case run with DW, which is also the name used to store the run in ec:../{deode_user}deode/
+Where experiment_name is generally the name of the suite of the case run with DW, which is also the name used to store the run in ec:../{deode_user}/deode/
+
 The three optional arguments are to be used when verifying aut6432's indexed runs: refer to dcmdb or to the weekly logs by the on-duty team to get info about these runs.
+
 If everything went fine, a new suite will appear in your ecflow_ui, named just like the deode case, with a family called "Case_point_verification" and tasks to get the verification files, Verify, and save the files conveniently:
 
 ![Screenshot from 2024-10-21 10-59-18](https://github.com/user-attachments/assets/f68f5f10-2488-437b-932d-709bd8914d60)

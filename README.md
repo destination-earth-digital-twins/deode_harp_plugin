@@ -4,8 +4,9 @@ Plugin interface to run harp point verification for deode extreme weather cases.
 # Prerrequisites:
 - An installation of harpv02.2 or higher. Instructions can be found here: https://harphub.github.io/harp_training_2024/get-started.html
 - Get the official harp scripts for operational use, available in https://github.com/harphub/oper-harp-verif
-- To run 
-
+- There are some extra R packages needed by oper-harp-verif which are not usually installed with harp: "here", "argparse", "pracma" , "pals", "shinyWidgets", "cowplot", "scico", "sf". Install in R console with install.packages("here") etc...
+- Load the R module by default in your $HOME/.bahsrc
+  
 # How to use:
 This plugin needs the config.toml file from the deode run that you want to verify as input. Relevant configuration of the verification paths, etc. must be updated in the file harpverify_plugin.toml. 
 

@@ -110,7 +110,7 @@ If everything went fine, a new suite will appear in your ecflow_ui, named just l
 In addition, for automatizing verifications run by the on-duty team, an auxiliar script is available (launch_from_dcmdb.py) to read new runs betweeen two dates from dcmdb,
 download the config files and launch all the suites. Make sure that [dcmdb](https://github.com/destination-earth-digital-twins/dcmdb) is installed in your system. The script is run like this:
 ```
-launch_from_dcmdb.py path/to/harpverify_plugin.toml start_date end_date
+python3 launch_from_dcmdb.py path/to/harpverify_plugin.toml start_date end_date
 ```
 Finally , it must be noted that, since these verifications are configured from the original toml files that ran the case, and the plugin makes use of the DW scripting system, it is highly recommended to use the same DW tag that originally ran the OD case.
 Otherwise, very often something will go wrong when creating the suites, given the very dynamic evolution of the DW. To know which tag was used for a specific OD case, look for "describe" in its config.toml file

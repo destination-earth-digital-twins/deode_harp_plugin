@@ -107,7 +107,7 @@ def main():
         if USE_OPERATIONAL_INDEXING == 'no':
             f.write(f"Path template : ec:/{args.deode_user}/{ECFS_ARCHIVE_RELPATH_DEODEOUTPUT}/{args.experiment}/archive/{args.year}/{args.month}/{args.day}\n")
         else:
-            f.write(f"Path template : ec:/{args.deode_user}/{ECFS_ARCHIVE_RELPATH_DEODEOUTPUT}/{args.year}/{args.month}/{args.day}/00/{args.event_type}/{args.order}/{args.csc_res}\n")
+            f.write(f"Path template : ec:/{args.deode_user}/{ECFS_ARCHIVE_RELPATH_DEODEOUTPUT}/{args.year}/{args.month}/{args.day}/00/{args.event_type}/{args.order}/{args.csc_res}/mbr001\n")
         f.write("--\n")
 
     # Validate file existence
@@ -128,7 +128,7 @@ def main():
         if USE_OPERATIONAL_INDEXING == 'no':
             path_template_config = f"ec:/{args.deode_user}/{ECFS_ARCHIVE_RELPATH_DEODEOUTPUT}/{experiment_name}/"
         else:
-            path_template_config = f"ec:/{args.deode_user}/{ECFS_ARCHIVE_RELPATH_DEODEOUTPUT}/{args.year}/{args.month}/{args.day}/00/{args.event_type}/{args.order}/{args.csc_res}"
+            path_template_config = f"ec:/{args.deode_user}/{ECFS_ARCHIVE_RELPATH_DEODEOUTPUT}/{args.year}/{args.month}/{args.day}/00/{args.event_type}/{args.order}/{args.csc_res}/mbr001"
 
         source_config = f"{path_template_config}/config.toml"
         dw_config = f"{VERIF_HOME}/config_files/{args.year}/{args.month}/{args.day}/config_{experiment_name}.toml"

@@ -1,5 +1,6 @@
 """Example Task."""	
 import os
+import re
 import glob
 from ..methods import ConfigHarpverify
 from deode.tasks.base import Task
@@ -34,6 +35,10 @@ class LinkOBSFCTABLES(Task):
             exp_scratch=self.config_verif.sqlites_exp_path.replace(self.config_verif.huser,self.config_verif.duser) #we must refer to deode user in case it's different than harp user
             #The line above should be something like /scratch/aut6432/DE_NWP/deode/2024/12/03/00//convection/1/HARMONIE_AROME_500m/sqlite/FCTABLE/
             local_fctables=os.path.join(self.config_verif.home,f"FCTABLES/",exp_relpath.lstrip('/'),self.config_verif.startyyyy,self.config_verif.startmm)
+            # Remove substrings like 'mbr000', 'mbr123', etc.
+            local_fctables = re.sub(r"mbr\d{3}", "", local_fctables)
+            # Clean up possible double slashes
+            local_fctables = os.path.normpath(local_fctables)
             #The line above evaluates ~ /ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLES//2024/12/03/00//convection/1/HARMONIE_AROME_500m/YYYY/MM/
             local_fctables_ref=local_fctables.split(self.config_verif.csc)[0] #This is where REF's folder with FCTABLES should be linked
             #The line above is where the Global_DT FCTABLES should be downloaded or linked for this experiment. It should be something like:
@@ -46,6 +51,8 @@ class LinkOBSFCTABLES(Task):
             exp_scratch=self.config_verif.sqlites_exp_path.replace(self.config_verif.huser,self.config_verif.duser) #we must refer to deode user in case it's different than harp user 
             #Construct local_fctables:
             local_fctables=os.path.join(self.config_verif.home,f"FCTABLES/",self.config_verif.case,self.config_verif.csc_resol,self.config_verif.startyyyy,self.config_verif.startmm)
+            print('local_fctables path is:')
+            print(local_fctables)
             #Construct local_fctables_ref:
             local_fctables_ref=os.path.join(self.config_verif.home,f"FCTABLES/",self.config_verif.case) #This is where REF's folder with FCTABLES should be linked
             exp_relpath=sqlites_relpath.split('sqlite')[0]    
@@ -110,14 +117,15 @@ class LinkOBSFCTABLES(Task):
                         print(f"Error creating symlink: {e}")
              else:
                     print('link to FCTABLES for REF exp exists already, linking command skipped') 	
-        #Finally, link observations if needed            
-        dir_path = os.path.join(self.config_verif.sqlites_obs_path, "*")
-        subdirs = glob.glob(dir_path)
-        if subdirs:
-           arg1=self.config_verif.sqlites_obs_path
-           arg2=os.path.join(self.config_verif.home, "OBSTABLESOPER/")
-           print("Found files in original path: linking obs sqlite files...")
-           self.config_verif.link_files(arg1,arg2)	
-        else:
-           print('No observations sqlite files available')
+
+        #Finally, link observations if needed (not needed anymore after managing observations through suites in snh02
+        #dir_path = os.path.join(self.config_verif.sqlites_obs_path, "*")
+        #subdirs = glob.glob(dir_path)
+        #if subdirs:
+        #   arg1=self.config_verif.sqlites_obs_path
+        #   arg2=os.path.join(self.config_verif.home, "OBSTABLESOPER/")
+        #   print("Found files in original path: linking obs sqlite files...")
+        #   self.config_verif.link_files(arg1,arg2)	
+        #else:
+        #   print('No observations sqlite files available')
 

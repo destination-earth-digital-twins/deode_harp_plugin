@@ -4,6 +4,8 @@ from pathlib import Path
 import toml
 import re
 from datetime import datetime
+sys.path.insert(0,'/ec/res4/hpcperm/snh02/DE_Verification/verif_tools/dcmdb/')
+sys.path.insert(0,'/ec/res4/hpcperm/snh02/DE_Verification/verif_tools/Upath')
 import dcmdb
 from pathlib import Path
 
@@ -35,6 +37,7 @@ with open(CASES_FILE, "w") as f:
             f.write(f"{exp.name}\n")
             f.write(f"File templates : {exp.metadata['runs'][0]['file_templates']}\n")
             f.write(f"Path template : {exp.metadata['runs'][0]['stores'][0]['path_template']}\n")
+            f.write(f"time_coverage_start : {exp.metadata['runs'][0]['setup']['time_coverage_start']}\n")
             f.write(f"--\n")
     print(f"New experiments to verify have been listed in {CASES_FILE}.\n")
 
@@ -61,15 +64,20 @@ def parse_experiments(file_path):
             if len(lines) >= 3:
                 experiment_name = lines[0].strip()
                 path_template = re.search(r"Path template\s*:\s*(.+)", group)
+                time_coverage_start_match = re.search(r"time_coverage_start\s*:\s*(.+)", group)
+                time_coverage_start = time_coverage_start_match.group(1).strip()
+
                 if path_template:
                     experiments.append({
                         "name": experiment_name,
-                        "path_template": path_template.group(1).strip()
+                        "path_template": path_template.group(1).strip(),
+                        "time_coverage_start": time_coverage_start
                     })
     return experiments
 
 experiments = parse_experiments(CASES_FILE)
-
+#print('parsed experimetns are')
+#print(experiments)
 
 
 # Helper function to check if a date is within range
@@ -81,27 +89,41 @@ def is_date_in_range(date_str, start_date, end_date):
 
 # Process each experiment
 for experiment in experiments:
+    print('experiment is')
+    print(experiment)
     experiment_name = experiment["name"]
     path_template = experiment["path_template"]
+    date_coverage= experiment["time_coverage_start"]
 
-    # Extract date components from the path template
+    # Try to extract date components from the path template
     match = re.search(r"/(\d{4})/(\d{2})/(\d{2})/", path_template)
-    if not match:
+    if match:
+        year, month, day = match.groups()
+        experiment_date = f"{year}{month}{day}"
+    else:
         print(f"Could not extract date from path template: {path_template}")
-        continue
-
-    year, month, day = match.groups()
-    experiment_date = f"{year}{month}{day}"
+        try:
+            dt = datetime.strptime(date_coverage, "%Y-%m-%d %H:%M:%S")
+            experiment_date = dt.strftime("%Y%m%d")
+            print(f"Falling back to date_coverage: {experiment_date}")
+            year = dt.strftime("%Y")
+            month = dt.strftime("%m")
+            day = dt.strftime("%d")
+        except ValueError:
+            print(f"Invalid date_coverage format: {date_coverage}")
+            continue  # skip this experiment
 
     # Skip experiments not within the date range
     if not is_date_in_range(experiment_date, START_DATE, END_DATE):
         print(f"Skipping {experiment_name} as it is outside the date range.")
         continue
+    # Replace placeholders in path if needed
+    resolved_path_template = path_template.replace("%Y", year).replace("%m", month).replace("%d", day).replace("%H", "00")
 
     # Define source and destination for the config file
-    source_config = f"{path_template}/config.toml"
+    source_config = f"{resolved_path_template}/config.toml"
     dw_config = f"{VERIF_HOME}/config_files/{year}/{month}/{day}/config_{experiment_name}.toml"
-    dw_harp_config = os.path.join(DW_DIR, "configuration_harp_plugin")
+    dw_harp_config = os.path.join(DW_DIR, "configuration_harp_plugin"+experiment_name)
 
     # Ensure the destination directory exists
     os.makedirs(os.path.dirname(dw_config), exist_ok=True)
@@ -111,14 +133,44 @@ for experiment in experiments:
     print(f"ecp {source_config} {dw_config}")
     os.system(f"ecp {source_config} {dw_config}")
     print(f"Copied config.toml from {source_config} to {dw_config}")
+    if not os.path.exists(dw_config):
+        print(f"[ERROR] Config file {dw_config} not found after ecp.")
+        continue # Go to the next experiment in the loop
+
+    # ASCII-edit 'case = ...' in dw_config to insert @CASE_PREFIX@
+    with open(dw_config, "r") as f:
+        lines = f.readlines()
+    updated_lines = []
+    case_updated = False
+    for line in lines:
+        if line.strip().startswith("case"):
+            match = re.match(r'(case\s*=\s*["\'])(.*?)(["\'])', line.strip())
+            if match and not match.group(2).startswith("@CASE_PREFIX@"):
+                new_line = f'{match.group(1)}@CASE_PREFIX@{match.group(2)}{match.group(3)}\n'
+                updated_lines.append(new_line)
+                case_updated = True
+                print(f"Updated 'case' line to: {new_line.strip()}")
+            else:
+                updated_lines.append(line)
+        elif line.strip().startswith("bdmember"):
+                new_line = "# bdmember \n"
+                updated_lines.append(new_line)
+        else:
+            updated_lines.append(line)
+    with open(dw_config, "w") as f:
+        f.writelines(updated_lines)
+    if not case_updated:
+        print("[WARNING] 'bdmember ' line not found or unchanged.")
 
     # Write the harp plugin configuration
+
     with open(dw_harp_config, "w") as harp_config:
         harp_config.write(f"--config-file\n{dw_config}\n{DEODE_PLUGINS}/harpverify/harpverify_plugin.toml\n")
 
     # Run the deode commands
     config_harp_file = f"{VERIF_HOME}/config_files/{year}/{month}/{day}/config_harp_{experiment_name}.toml" 
-    os.system(f"deode case ?{dw_harp_config} -o {config_harp_file} --start-suite")
+    #os.system("poetry run deode -h")
+    os.system(f"echo deode case ?{dw_harp_config} -o {config_harp_file} --start-suite >> verifsuites.txt")
 
 print("Script completed.")
 

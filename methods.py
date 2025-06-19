@@ -65,6 +65,7 @@ class ConfigHarpverify(object):
         self.rdss_path=self.platform.get_value("submission.harpverify_group.ENV.RDSS_PATH")
         self.pngs_path=self.platform.get_value("submission.harpverify_group.ENV.PNGS_PATH")
         self.ref_name=self.platform.get_value("submission.harpverify_group.ENV.REF_NAME")
+        self.Renv_conf=self.platform.get_value("submission.harpverify_group.ENV.Renv_conf")
         self._case_args = None
         self._exp_args = None
         self.config_yaml = None

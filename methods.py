@@ -75,6 +75,11 @@ class ConfigHarpverify(object):
         self.ecfs_archive_relpath_harpoutput = self.platform.get_value("submission.harpverify_group.ENV.ECFS_ARCHIVE_RELPATH_HARPOUTPUT")
         self.csc_resol=self.config["general.csc"]+'_'+str(self.config["domain.xdx"])+'m'
         self.harpverify_path=self.platform.get_value("general.plugin_registry.plugins.harpverify")+'/harpverify/'
+        self.eps=  True if len(self.platform.get_value("eps.general.members"))> 1 else False
+        self.sqlites_exp_path=self.platform.get_value("extractsqlite.merged_sqlite_path") if self.eps else self.platform.get_value("extractsqlite.sqlite_path")
+        self.plugin_path=self.platform.get_value("general.plugin_registry.plugins.harpverify")+'/harpverify/'
+        self.set_params=os.path.join(self.plugin_path,'templates','set_params_eps.R' if self.eps else 'set_params_det.R')
+
 
     def write_config_yml(self,write=True):
         """descrp.
@@ -83,7 +88,7 @@ class ConfigHarpverify(object):
             case (str): Recipient of the greeting
         """
         print('self.home es ' + self.home)
-        config_template = os.path.join(self.harpverify_path,"templates/deode_conf.yml")
+        config_template = os.path.join(self.harpverify_path,"templates/deode_conf_eps.yml" if self.eps else "templates/deode_conf_det.yml")
         self.config_yaml_filename = os.path.join(self.home, f"config_files/",self.startyyyy,self.startmm,self.startdd,f"deode_conf_{self.case}.yml")
         print("config_template es")
         print(config_template)

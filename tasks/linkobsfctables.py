@@ -94,12 +94,12 @@ class LinkOBSFCTABLES(Task):
            except Exception as e:
               print(f"An error occurred: {e}")
            subprocess.run(["ecp", ecfs_exp_sqlites_path, local_fctables], check=True)           
-
         for ref_model in self.config_verif.ref_name:
+           print(f'Getting FCTABLES for {ref_model}')
            if os.path.exists(os.path.join(self.config_verif.sqlites_ref_path,ref_model)):
-             print('linking FCTABLES for REF exp...')
+             print(f'linking FCTABLES for reference experiments')
              if not os.path.exists(os.path.join(local_fctables_ref,ref_model)): # If linked folder does not exist
-                    print('linking FCTABLES path for REF exp...')
+                    print(f'linking FCTABLES path for REF exp {ref_model}')
                     source_path = os.path.join(self.config_verif.sqlites_ref_path,ref_model)
                     destination_folder = local_fctables_ref
                     # Ensure the destination is a directory
@@ -116,16 +116,4 @@ class LinkOBSFCTABLES(Task):
                     except Exception as e:
                         print(f"Error creating symlink: {e}")
              else:
-                    print('link to FCTABLES for REF exp exists already, linking command skipped') 	
-
-        #Finally, link observations if needed (not needed anymore after managing observations through suites in snh02
-        #dir_path = os.path.join(self.config_verif.sqlites_obs_path, "*")
-        #subdirs = glob.glob(dir_path)
-        #if subdirs:
-        #   arg1=self.config_verif.sqlites_obs_path
-        #   arg2=os.path.join(self.config_verif.home, "OBSTABLESOPER/")
-        #   print("Found files in original path: linking obs sqlite files...")
-        #   self.config_verif.link_files(arg1,arg2)	
-        #else:
-        #   print('No observations sqlite files available')
-
+                    print('link to FCTABLES for REF exp exists already, linking command skipped') 

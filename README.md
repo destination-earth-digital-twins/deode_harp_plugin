@@ -13,8 +13,8 @@ This plugin needs the config.toml file from the deode run that you want to verif
 To create a verification suite from a config.toml and the harpverify_plugin.toml file, create a file -e.g. called configuration- in the Deode-Workflow home directory, with the following content:
 ```
 --config-file
-  /path/to/config.toml
-  /path/to/harpverify_plugin.toml
+/path/to/config.toml
+/path/to/harpverify_plugin.toml
 ```
 Check for the comments in harpverify_plugin.toml to understand how to set each plugin/user specific variable:
 ```

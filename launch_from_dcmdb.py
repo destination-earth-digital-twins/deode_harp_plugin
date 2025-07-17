@@ -170,7 +170,7 @@ for experiment in experiments:
     # Run the deode commands
     config_harp_file = f"{VERIF_HOME}/config_files/{year}/{month}/{day}/config_harp_{experiment_name}.toml" 
     #os.system("poetry run deode -h")
-    os.system(f"echo deode case ?{dw_harp_config} -o {config_harp_file} --start-suite >> verifsuites.txt")
+    os.system(f"deode case ?{dw_harp_config} -o {config_harp_file} --start-suite >> verifsuites.txt")
 
 print("Script completed.")
 

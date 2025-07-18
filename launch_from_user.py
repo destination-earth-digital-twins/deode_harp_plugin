@@ -171,7 +171,7 @@ def main():
 
         # Write plugin config
         with open(dw_harp_config, "w") as harp_config:
-            harp_config.write(f"--config-file\n{dw_config}\n{DEODE_PLUGINS}/harpverify/harpverify_plugin.toml\n")
+            harp_config.write(f"--config-file\n{dw_config}\n{DEODE_PLUGINS}/harpverify/{args.config_file}\n")
         verbose_print(f"Wrote harp plugin configuration to {dw_harp_config}")
 
         # Run deode

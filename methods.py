@@ -39,6 +39,7 @@ class ConfigHarpverify(object):
         self.huser = self.platform.get_value("submission.harpverify_group.ENV.HUSER")
         self.duser= self.platform.get_value("submission.harpverify_group.ENV.DUSER")
         self.obs_step= self.platform.get_value("submission.harpverify_group.ENV.OBS_STEP")
+        self.obstables_path= self.platform.get_value("submission.harpverify_group.ENV.OBSTABLES_PATH")
         self.use_operational_indexing= self.platform.get_value("submission.harpverify_group.ENV.USE_OPERATIONAL_INDEXING")
         self.harpscripts_home=self.platform.get_value("submission.harpverify_group.ENV.HARPSCRIPTS_HOME")
         self.cnmexp = self.config["general.cnmexp"]
@@ -57,8 +58,9 @@ class ConfigHarpverify(object):
         self.forecast_range_nr = forecast_range_to_hours(self.forecast_range)
         self.endyyyymmddhh = (datetime.strptime(self.start, "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=self.forecast_range_nr)).strftime("%Y%m%d%H")
         self.exp = self._set_exp()
-        self.case_prefix=self.platform.get_value("scheduler.ecfvars.case_prefix")
-        self.case = self.platform.get_value("general.case").removeprefix(self.case_prefix) # Remove case_prefix from suite name to get correct case names.
+        #self.case_prefix=self.platform.get_value("scheduler.ecfvars.case_prefix")
+        self.case_prefix=self.platform.get_value("impact.verification.verification_prefix")
+        self.case = self.platform.get_value("general.case").removeprefix(self.case_prefix) # Remove case_prefix from suite name to get original case names.
         self.sqlites_exp_path=self.platform.get_value("extractsqlite.sqlite_path")
         self.sqlites_ref_path=self.platform.get_value("submission.harpverify_group.ENV.REF_SQLITES")
         self.sqlites_obs_path=self.platform.get_value("submission.harpverify_group.ENV.OBSTABLES_PATH")
@@ -122,7 +124,7 @@ class ConfigHarpverify(object):
             self._exp_args["verif"]["fcst_model"]=list(self.ref_name) + [self.csc_resol]
             self._exp_args["verif"]["project_name"]=[self.case]
             self._exp_args["verif"]["lead_time"]= f"seq(0,{self.forecast_range_nr},{self.obs_step})"
-            self._exp_args["verif"]["obs_path"]=[self.home + '/OBSTABLESOPER/']
+            self._exp_args["verif"]["obs_path"]=[self.obstables_path]
             if self.use_operational_indexing=="yes":
                 self._exp_args["verif"]["verif_path"]=[os.path.join(self.rdss_path,exp_relpath.lstrip('/').split(self.csc)[0])]
                 self._exp_args["post"]["plot_output"]=[os.path.join(self.pngs_path,exp_relpath.lstrip('/').split(self.csc)[0])]

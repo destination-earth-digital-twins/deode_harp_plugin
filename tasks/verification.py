@@ -4,6 +4,8 @@ import subprocess
 from ..methods import ConfigHarpverify
 from deode.tasks.base import Task
 from deode.tasks.batch import BatchJob
+import random
+import sleep
 
 
 class Verification(Task):
@@ -38,6 +40,11 @@ class Verification(Task):
         print(harp_scripts)
         print(os.getenv("HOME"))
         os.chdir(harp_scripts)
+        # Wait for a random number of minutes between 0 and 5
+        delay_minutes = random.randint(0, 5)
+        print(f"Waiting for {delay_minutes} minute(s) before executing batch command...")
+        print(f"This is to prevent station list from different cases to be written simultaneously in oper-harp-verif/verification")
+        time.sleep(delay_minutes * 60)
         Renv_conf=self.config_verif.Renv_conf
         self.batch.run(f"source {Renv_conf} ; Rscript {harp_scripts}/verification/point_verif.R -config_file {config_yaml_filename} -start_date {start_date} -end_date {start_date} -params_list=T2m,S10m,CCtot,S,D,RH,T,Q,Z,Pcp,AccPcp1h,Gmax,T2m,S10m,Pcp,AcccPcp3h,AccPcp6h,AccPcp12h,AccPcp24h -params_file {self.config_verif.set_params}")
 

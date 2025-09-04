@@ -66,7 +66,7 @@ class HarpverifySuiteDefinition(SuiteDefinition):
         print("end_date:",     end_date.strftime("%Y%m%d"))
         print("delay_date:",   delay_date.strftime("%Y%m%d"))
 
-        # We want retrieval to begin with a delay, to make sure MARS data is available.
+        # We want retrieval to begin with a delay, to make sure obs data is available in OBSTABLES
         # Use _JULIAN for looking at differences > 1 day.
 
         delay_date_julian=as_julian(delay_date.strftime("%Y%m%d"))
